@@ -1,0 +1,2 @@
+-- Admin policies are included in schema.sql.
+-- You only need to run supabase/schema.sql once in the SQL Editor.
