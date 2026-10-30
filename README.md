@@ -6,7 +6,7 @@ A cross-platform subscription management application built with **React Native**
 
 ## 🚀 Live Demo
 
-**Deployed on Netlify:** [your-netlify-link-here]
+**Deployed on Netlify:** [recurrlysubscription.netlify.app](https://recurrlysubscription.netlify.app)
 
 ---
 
