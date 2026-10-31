@@ -180,11 +180,10 @@ export function isAllowedEmail(email?: string | null) {
 
 ### Testing Domain Restriction:
 
-| `.env` Value | Behavior |
-|---|---|
-| `hbplus.fit` | Only `@hbplus.fit` emails allowed |
-| `gmail.com` | Only `@gmail.com` emails allowed |
-| `*` | All email domains allowed |
+| `.env` / Netlify Value | Access Behavior | Assignment Context |
+|---|---|---|
+| `hbplus.fit` | Only `@hbplus.fit` emails allowed | **Default for Assignment:** `@hbplus.fit` emails are granted access. Personal emails (`@gmail.com`, etc.) are blocked with access restriction error. |
+| `*` | All email domains allowed | Open testing mode (allows `@gmail.com` and other domains for general evaluation). |
 
 ---
 
