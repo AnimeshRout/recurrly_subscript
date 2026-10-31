@@ -273,6 +273,15 @@ dist/
 
 ---
 
+## 📌 Note for Evaluators
+
+- **Allowed Access:** Any Google account ending in **`@hbplus.fit`** is granted full access to the Dashboard and Admin features.
+- **Blocked Access:** Any standard personal email (such as **`@gmail.com`**, `@yahoo.com`, etc.) is blocked with the error message:
+  > *"Access restricted. Please login using your official domain email."*
+- **Environment Configuration:** Domain validation is governed by the `EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN` environment variable. On production/Netlify, setting this to `hbplus.fit` enforces company-only access, while `*` can be used to permit all domains for open testing.
+
+---
+
 ## 📄 License
 
-Private — built for the HB+ IT Internship Assessment.
+MIT License — Personal Project.
