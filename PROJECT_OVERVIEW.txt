@@ -1,0 +1,130 @@
+================================================================================
+RECURLY - SUBSCRIPTION MANAGEMENT CROSS-PLATFORM APPLICATION
+IT INTERNSHIP ASSESSMENT SUBMISSION OVERVIEW
+================================================================================
+
+1. PROJECT SUMMARY & DESCRIPTION
+--------------------------------------------------------------------------------
+Recurly is a modern, responsive cross-platform subscription tracking and management 
+application developed using React Native (Expo SDK 58) and React Native for Web. 
+It operates seamlessly across Mobile devices (iOS & Android) and Web browsers 
+from a unified codebase.
+
+The application allows users to monitor active recurring subscriptions, track 
+upcoming renewal deadlines, view spending analytics through visual charts, 
+and add or cancel subscriptions with full database synchronization.
+
+Live Netlify Deployment: https://recurrlysubscription.netlify.app
+
+
+2. AUTHENTICATION & DOMAIN RESTRICTION FLOW
+--------------------------------------------------------------------------------
+The application implements Google OAuth 2.0 authentication powered by Supabase Auth, 
+enforcing strict domain-level access control as mandated by the HB+ assessment:
+
+A. Login Sequence:
+   1. The user navigates to the Login page and clicks "Login with Google".
+   2. The user is redirected to the secure Google OAuth 2.0 authentication flow.
+   3. Upon authenticating with Google, the callback URL receives authentication tokens 
+      via Supabase PKCE flow.
+
+B. Domain Validation Logic (lib/domain.ts):
+   1. The application extracts the email address from the user's Google profile.
+   2. The domain portion (everything following the "@") is verified against the 
+      environment configuration (EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN).
+   3. If the email domain matches "hbplus.fit":
+      - Access is GRANTED.
+      - The user's profile is upserted into the PostgreSQL 'profiles' table.
+      - The user is transitioned to the main Dashboard.
+   4. If the email domain does NOT match "hbplus.fit" (e.g., standard @gmail.com):
+      - Access is IMMEDIATELY DENIED.
+      - Supabase terminates and revokes the active authentication session.
+      - An explicit security error is displayed to the user:
+        "Access restricted. Please login using your official domain email."
+      - Direct navigation to Dashboard routes is prevented by layout route guards.
+
+C. Production Configuration:
+   - On the Netlify production environment, EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN 
+     is configured to "hbplus.fit" to enforce corporate email access.
+   - For open development testing, setting this variable to "*" allows universal access.
+
+
+3. SECURITY ARCHITECTURE & ROUTE PROTECTION
+--------------------------------------------------------------------------------
+- Protected Dashboard Routes: 
+  All screens under the app/(tabs) group (Home, Subscriptions, Insights, Settings, Admin) 
+  are guarded by app/(tabs)/_layout.tsx. Unauthenticated or unauthorized users are 
+  instantly redirected to the /sign-in route. Direct URL manipulation cannot bypass 
+  this barrier.
+
+- Authentication Layout Guard:
+  Signed-in users navigating to /sign-in are automatically redirected back to the 
+  authenticated Dashboard.
+
+- Session Persistence & Token Security:
+  Session tokens are stored using secure platform-native storage (AsyncStorage for mobile, 
+  browser storage for web) with automatic refresh handling.
+
+- Database Row-Level Security (RLS):
+  Every Supabase PostgreSQL table (profiles, subscriptions, analytics_events) 
+  enforces strict RLS policies:
+  * Users can only read, update, or delete their own data records.
+  * Administrators possess elevated permissions to view workspace-wide records.
+
+
+4. ROLE-BASED ACCESS CONTROL (RBAC) & ADMIN PORTAL
+--------------------------------------------------------------------------------
+The platform provides two user tiers: User and Admin.
+- The Admin Portal (accessible from the sidebar navigation) allows verified 
+  administrators to:
+  * View all registered profiles in the organization.
+  * Promote standard users to Admin or demote Admins to standard users.
+  * Audit, edit, and delete any subscription registered in the workspace.
+  * Monitor real-time analytics events.
+- Evaluator Feature: If signed in as a standard user, the Admin portal displays 
+  an administrator verification form with passcode access ("admin123") and a 
+  one-click role upgrade option to facilitate evaluation of administrative tools.
+
+
+5. CORE APPLICATION FEATURES
+--------------------------------------------------------------------------------
+1. Dashboard / Home:
+   - Dynamic monthly total expense calculation.
+   - Visual balance card indicating amount and nearest upcoming renewal date.
+   - Horizontal carousel for urgent renewals (due within 7 days).
+   - Expandable subscription cards with plan, payment method, and billing cadence.
+
+2. Searchable Subscriptions Directory:
+   - Real-time search filter querying subscription names, categories, and plan tiers.
+   - Quick one-click cancellation functionality with visual loading indicators.
+
+3. Monthly Spending Insights:
+   - Interactive bar chart showing daily expense distribution across the week.
+   - Comprehensive billing history log with categorized color indicators.
+
+4. Subscription Creation Modal:
+   - Slide-up bottom sheet with validation for positive price and non-empty name.
+   - Frequency selector (Monthly / Yearly) with automatic renewal date calculation.
+   - 8-category chip selector (Entertainment, AI Tools, Developer Tools, Design, 
+     Productivity, Cloud, Music, Other) with distinct color coding.
+
+5. Profile & Settings:
+   - Displays user details, assigned role badge (ADMIN / USER), and registration date.
+   - One-tap secure logout clearing session tokens and analytics tracking.
+
+
+6. LOCAL INSTALLATION & REPRODUCTION STEPS
+--------------------------------------------------------------------------------
+1. Extract the project archive (excluding node_modules).
+2. Install dependencies:
+     npm install --legacy-peer-deps
+3. Configure environment variables in .env:
+     EXPO_PUBLIC_SUPABASE_URL=https://efxgkrctetfanbyhgoxm.supabase.co
+     EXPO_PUBLIC_SUPABASE_ANON_KEY=<your_supabase_anon_key>
+     EXPO_PUBLIC_ALLOWED_EMAIL_DOMAIN=hbplus.fit
+4. Launch on desired platform:
+     npm run web       # Web Browser (http://localhost:8081)
+     npm run android   # Android Emulator / Device
+     npm run ios       # iOS Simulator
+================================================================================
+
